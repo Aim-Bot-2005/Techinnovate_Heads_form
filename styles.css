@@ -58,10 +58,10 @@ h1, h2, h3, h4 {
 }
 
 .logo-img {
-    width: 55px;
-    height: 55px;
+    width: 75px;
+    height: 75px;
     object-fit: contain;
-    filter: brightness(1.5) contrast(1.2);
+    filter: brightness(1) contrast(1.2);
 }
 
 .logo-text {
