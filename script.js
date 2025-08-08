@@ -253,8 +253,8 @@ if (joinForm) {
             // Show success message
             showNotification('Application submitted successfully! We\'ll get back to you soon.', 'success');
             
-            // Reset form
-            this.reset();
+            // Replace form with thank you message and WhatsApp link
+            showThankYouMessage();
             
             // Reset button state
             btnText.style.display = 'inline';
@@ -262,9 +262,109 @@ if (joinForm) {
             submitBtn.disabled = false;
         }).catch(() => {
             // Fallback: submit using traditional method
+            // Replace form with thank you message and WhatsApp link even with fallback
+            showThankYouMessage();
             this.submit();
         });
     });
+}
+
+// WhatsApp redirect button functionality
+function showWhatsAppButton() {
+    // Check if button already exists to avoid duplicates
+    const existingButton = document.getElementById('whatsapp-redirect-btn');
+    if (existingButton) {
+        return;
+    }
+    
+    // Create WhatsApp redirect button
+    const whatsappButton = document.createElement('div');
+    whatsappButton.id = 'whatsapp-redirect-btn';
+    whatsappButton.innerHTML = `
+        <div class="whatsapp-button-content">
+            <i class="fab fa-whatsapp"></i>
+            <span>Join Our WhatsApp Group</span>
+            <i class="fas fa-arrow-right"></i>
+        </div>
+    `;
+    
+    // Add styles for the WhatsApp button
+    whatsappButton.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        background: linear-gradient(45deg, #25D366, #128C7E);
+        color: #ffffff;
+        padding: 15px 25px;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+        cursor: pointer;
+        z-index: 1001;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        animation: whatsapp-pulse 2s infinite;
+    `;
+    
+    // Style the button content
+    const buttonContent = whatsappButton.querySelector('.whatsapp-button-content');
+    if (buttonContent) {
+        buttonContent.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        `;
+    }
+    
+    // Add click event listener using the global WhatsApp link
+    whatsappButton.addEventListener('click', () => {
+        // Use the global WhatsApp link (can be updated via updateWhatsAppLink function)
+        const whatsappLink = window.TECHINNOVATE_WHATSAPP_LINK || 'https://wa.me/1234567890?text=Hello%20TECHINNOVATE!%20I%20just%20submitted%20my%20application%20and%20would%20like%20to%20join%20the%20WhatsApp%20group.';
+        window.open(whatsappLink, '_blank');
+        
+        // Hide the button after clicking
+        whatsappButton.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (whatsappButton.parentNode) {
+                whatsappButton.parentNode.removeChild(whatsappButton);
+            }
+        }, 300);
+    });
+    
+    // Add hover effects
+    whatsappButton.addEventListener('mouseenter', () => {
+        whatsappButton.style.transform = 'translateX(0) scale(1.05)';
+        whatsappButton.style.boxShadow = '0 15px 40px rgba(37, 211, 102, 0.6)';
+    });
+    
+    whatsappButton.addEventListener('mouseleave', () => {
+        whatsappButton.style.transform = 'translateX(0) scale(1)';
+        whatsappButton.style.boxShadow = '0 10px 30px rgba(37, 211, 102, 0.4)';
+    });
+    
+    // Add to DOM
+    document.body.appendChild(whatsappButton);
+    
+    // Animate in after a short delay
+    setTimeout(() => {
+        whatsappButton.style.transform = 'translateX(0)';
+    }, 500);
+    
+    // Auto-hide after 30 seconds if not clicked
+    setTimeout(() => {
+        if (whatsappButton.parentNode) {
+            whatsappButton.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (whatsappButton.parentNode) {
+                    whatsappButton.parentNode.removeChild(whatsappButton);
+                }
+            }, 300);
+        }
+    }, 30000);
 }
 
 // Notification system
@@ -309,6 +409,123 @@ function showNotification(message, type = 'info') {
             document.body.removeChild(notification);
         }, 300);
     }, 5000);
+}
+
+// Thank you message with WhatsApp link
+function showThankYouMessage() {
+    // Get the form container
+    const formContainer = document.querySelector('.form-container');
+    if (!formContainer) return;
+    
+    // Create thank you message box
+    const thankYouBox = document.createElement('div');
+    thankYouBox.className = 'thank-you-box';
+    thankYouBox.innerHTML = `
+        <div class="thank-you-content">
+            <h3>Thank You for Your Application!</h3>
+            <p>Your application has been submitted successfully. We'll review it and get back to you soon.</p>
+            <p>In the meantime, join our WhatsApp group to stay updated:</p>
+            <a href="${window.TECHINNOVATE_WHATSAPP_LINK || 'https://wa.me/1234567890?text=Hello%20TECHINNOVATE!%20I%20just%20submitted%20my%20application%20and%20would%20like%20to%20join%20the%20WhatsApp%20group.'}"
+               class="btn btn-primary whatsapp-link" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+                Join WhatsApp Group
+            </a>
+        </div>
+    `;
+    
+    // Add styles for the thank you box
+    thankYouBox.style.cssText = `
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.6s ease-out;
+    `;
+    
+    // Style the heading
+    const heading = thankYouBox.querySelector('h3');
+    if (heading) {
+        heading.style.cssText = `
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        `;
+    }
+    
+    // Style the paragraphs
+    const paragraphs = thankYouBox.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        p.style.cssText = `
+            color: #cccccc;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        `;
+    });
+    
+    // Style the WhatsApp link button
+    const whatsappLink = thankYouBox.querySelector('.whatsapp-link');
+    if (whatsappLink) {
+        whatsappLink.style.cssText = `
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            color: #ffffff;
+            margin-top: 20px;
+        `;
+        
+        // Add hover effect
+        whatsappLink.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px) scale(1.05)';
+            this.style.boxShadow = '0 10px 30px rgba(37, 211, 102, 0.4)';
+        });
+        
+        whatsappLink.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = 'none';
+        });
+    }
+    
+    // Replace form with thank you box
+    formContainer.innerHTML = '';
+    formContainer.appendChild(thankYouBox);
+    
+    // Add animation CSS if not already present
+    if (!document.getElementById('thank-you-animation')) {
+        const style = document.createElement('style');
+        style.id = 'thank-you-animation';
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }
 
 // Form validation enhancement
@@ -572,3 +789,13 @@ successStyle.textContent = `
     }
 `;
 document.head.appendChild(successStyle);
+
+// Function to update WhatsApp link (to be called when actual link is provided)
+function updateWhatsAppLink(newLink) {
+    // Store the WhatsApp link globally for future use
+    window.TECHINNOVATE_WHATSAPP_LINK = newLink;
+    console.log('WhatsApp link updated:', newLink);
+}
+
+// Default WhatsApp link (placeholder)
+window.TECHINNOVATE_WHATSAPP_LINK = 'https://chat.whatsapp.com/BrK7g7JjPsG5silp28znPB?mode=ac_t';

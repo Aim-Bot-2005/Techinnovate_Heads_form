@@ -1086,3 +1086,16 @@ section {
         transform: translateX(0);
     }
 }
+
+/* WhatsApp button pulse animation */
+@keyframes whatsapp-pulse {
+    0% {
+        box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+    }
+    50% {
+        box-shadow: 0 10px 30px rgba(37, 211, 102, 0.7), 0 0 0 10px rgba(37, 211, 102, 0.1);
+    }
+    100% {
+        box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+    }
+}
